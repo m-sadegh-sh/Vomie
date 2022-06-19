@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_form_bloc/flutter_form_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:xoomie/src/sign_in/bloc/sign_in_repository.dart';
 import 'package:xoomie/src/sign_in/bloc/sign_in_with_google_event.dart';
 import 'package:xoomie/src/sign_in/bloc/sign_in_with_google_state.dart';

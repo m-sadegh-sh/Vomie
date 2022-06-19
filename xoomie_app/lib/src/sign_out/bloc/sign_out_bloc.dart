@@ -1,4 +1,4 @@
-import 'package:flutter_form_bloc/flutter_form_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:xoomie/src/sign_out/bloc/sign_out_event.dart';
 import 'package:xoomie/src/sign_out/bloc/sign_out_repository.dart';
 import 'package:xoomie/src/sign_out/bloc/sign_out_state.dart';
