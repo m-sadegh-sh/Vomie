@@ -1,6 +1,10 @@
 {
   "appTitle": "Xoomie",
 
+  "httpErrorNoConnection": "Failed to interact with our servers. Do you have a reliable network connection?",
+  "httpErrorServer": "Failed to process a request. This might be a temporarery problem. If this happended again, please let us know.",
+  "httpErrorCancel": "Request has been cancelled.",
+
   "commonWaiting": "Please wait...",
   "commonDefaultError": "An unexpected error has occurred.",
   "commonTermsOfUse": "Terms of use",
