@@ -1,6 +1,6 @@
 import 'package:xoomie/src/base/bloc/state_base.dart';
 import 'package:xoomie/src/base/widgets/localized_text.dart';
-import 'package:xoomie/src/photos/models/photo_model.dart';
+import 'package:xoomie/src/photos/models/photo_group_model.dart';
 
 abstract class PhotosStateBase extends StateBase {
   const PhotosStateBase();
@@ -15,12 +15,14 @@ class PhotosLoadingState extends PhotosStateBase {
 }
 
 class PhotosLoadedState extends PhotosStateBase {
-  final List<PhotoModel> photos;
+  late final List<PhotoGroupModel> groups;
 
-  const PhotosLoadedState(this.photos);
+  PhotosLoadedState(Iterable<PhotoGroupModel> groups) {
+    this.groups = List.unmodifiable(groups);
+  }
 
   @override
-  List<Object?> get props => [photos];
+  List<Object?> get props => [groups];
 }
 
 class PhotosLoadFailedState extends PhotosStateBase {

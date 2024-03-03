@@ -1,23 +1,23 @@
 import 'dart:async';
+import "package:collection/collection.dart";
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'package:xoomie/src/http/client.dart';
 import 'package:xoomie/src/photos/bloc/photos_event.dart';
 import 'package:xoomie/src/photos/bloc/photos_repository.dart';
 import 'package:xoomie/src/photos/bloc/photos_state.dart';
+import 'package:xoomie/src/photos/models/photo_group_model.dart';
 
 class PhotosBloc extends Bloc<PhotosEventBase, PhotosStateBase> {
   final PhotosRepositoryBase repository;
-  final String? userId;
 
   PhotosBloc({
     required this.repository,
-    this.userId,
   }) : super(const PhotosInitialState()) {
     on<PhotosLoadEvent>(_onLoad);
 
-    add(PhotosLoadEvent(
-      userId: userId,
-    ));
+    add(const PhotosLoadEvent());
   }
 
   Future<void> _onLoad(
@@ -28,13 +28,26 @@ class PhotosBloc extends Bloc<PhotosEventBase, PhotosStateBase> {
       emit(const PhotosLoadingState());
 
       final photos = await repository.load(
-        userId: userId,
+        page: event.page,
+        perPage: event.perPage,
+        orderBy: event.orderBy,
       );
 
-      emit(PhotosLoadedState(photos));
+      final format = DateFormat.yMd();
+      final groups = photos
+          .groupListsBy(
+            (photo) => format.format(photo.createdAt),
+          )
+          .entries
+          .map((entry) => PhotoGroupModel(
+                date: format.parse(entry.key),
+                photos: entry.value,
+              ));
+
+      emit(PhotosLoadedState(groups));
     } catch (e) {
       emit(PhotosLoadFailedState(
-        (x) => 'x.photosBlocLoadFailed',
+        unwrapError(e) ?? (x) => x.photosBlocLoadFailed,
       ));
     }
   }

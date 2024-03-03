@@ -18,6 +18,11 @@ const switchTrackSelectedColor = Color(0xFFB964B7);
 const switchTrackDisabledColor = Color(0xFFDFDFDF);
 const dividerColor = Color(0xFFE6E6E6);
 const brandColor = Color(0xFFE94057);
+const shimmerColors = [
+  Color(0xfff6f7f9),
+  Color(0xffe9ebee),
+  Color(0xfff6f7f9),
+];
 
 /// Light theme colors
 const lightSystemBarsColor = transparentColor;
@@ -36,7 +41,9 @@ final lightSwitchTrackColorSwatch = createMaterial(
   selected: switchTrackSelectedColor,
   disabled: switchTrackDisabledColor,
 );
+const lightShimmerColors = shimmerColors;
 
 /// Dark theme colors
 const darkSystemBarsColor = transparentColor;
 const darkCanvasColor = blackColor;
+const darkShimmerColors = shimmerColors;

@@ -1,11 +1,16 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_form_bloc/flutter_form_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:xoomie/src/base/screens/screen_base.dart';
 import 'package:xoomie/src/base/widgets/default_transition_switcher.dart';
 import 'package:xoomie/src/base/widgets/localized_text.dart';
+import 'package:xoomie/src/base/widgets/message_box.dart';
 import 'package:xoomie/src/base/widgets/region.dart';
+import 'package:xoomie/src/base/widgets/shimmer.dart';
 import 'package:xoomie/src/home/widgets/home_bottom_navigation_bar.dart';
+import 'package:xoomie/src/photos/bloc/photos_bloc.dart';
+import 'package:xoomie/src/photos/bloc/photos_state.dart';
 import 'package:xoomie/src/photos/models/photo_group_model.dart';
 import 'package:xoomie/src/photos/models/photo_model.dart';
 import 'package:xoomie/src/router/bloc/router_bloc.dart';
@@ -76,64 +81,6 @@ class HomeScreen extends ScreenBase {
       const HomeBottomNavigationBar();
 }
 
-final groups = [
-  PhotoGroupModel(
-    date: DateTime(2022, 06, 01),
-    photos: [
-      PhotoModel(id: '1'),
-      PhotoModel(id: '2'),
-      PhotoModel(id: '3'),
-      PhotoModel(id: '4'),
-      PhotoModel(id: '5'),
-      PhotoModel(id: '6'),
-    ],
-  ),
-  PhotoGroupModel(
-    date: DateTime(2022, 05, 29),
-    photos: [
-      PhotoModel(id: '1'),
-      PhotoModel(id: '2'),
-      PhotoModel(id: '3'),
-      PhotoModel(id: '4'),
-      PhotoModel(id: '5'),
-      PhotoModel(id: '6'),
-    ],
-  ),
-  PhotoGroupModel(
-    date: DateTime(2022, 05, 25),
-    photos: [
-      PhotoModel(id: '1'),
-      PhotoModel(id: '2'),
-      PhotoModel(id: '3'),
-      PhotoModel(id: '4'),
-      PhotoModel(id: '5'),
-      PhotoModel(id: '6'),
-    ],
-  ),
-  PhotoGroupModel(
-    date: DateTime(2022, 05, 12),
-    photos: [
-      PhotoModel(id: '1'),
-      PhotoModel(id: '2'),
-      PhotoModel(id: '3'),
-      PhotoModel(id: '4'),
-      PhotoModel(id: '5'),
-      PhotoModel(id: '6'),
-    ],
-  ),
-  PhotoGroupModel(
-    date: DateTime(2022, 04, 29),
-    photos: [
-      PhotoModel(id: '1'),
-      PhotoModel(id: '2'),
-      PhotoModel(id: '3'),
-      PhotoModel(id: '4'),
-      PhotoModel(id: '5'),
-      PhotoModel(id: '6'),
-    ],
-  ),
-];
-
 class _HomeRandom extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -172,14 +119,40 @@ class _HomeRandom extends StatelessWidget {
           const SizedBox(
             height: paddingSmall,
           ),
-          Expanded(
-            child: _PhotoGroupList(
-              key: const ValueKey("randomPhotos"),
-              groups: groups,
+          const Expanded(
+            child: _PhotosContent(
+              key: ValueKey("randomPhotos"),
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _PhotosContent extends StatelessWidget {
+  const _PhotosContent({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PhotosBloc, PhotosStateBase>(
+      builder: (context, state) {
+        if (state is PhotosLoadFailedState) {
+          return MessageBox.error(
+            message: state.message,
+          );
+        }
+
+        if (state is PhotosLoadedState) {
+          return _PhotoGroupList(
+            groups: state.groups,
+          );
+        }
+
+        return const CircularProgressIndicator();
+      },
     );
   }
 }
@@ -189,7 +162,6 @@ class _PhotoGroupList extends StatelessWidget {
 
   const _PhotoGroupList({
     required this.groups,
-    super.key,
   });
 
   @override
@@ -248,7 +220,7 @@ class _PhotoList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    return ListView.separated(
       primary: false,
       shrinkWrap: true,
       itemCount: photos.length,
@@ -260,6 +232,11 @@ class _PhotoList extends StatelessWidget {
           photo: photo,
         );
       },
+      separatorBuilder: (context, index) => const Padding(
+        padding: EdgeInsets.only(
+          top: paddingMedium,
+        ),
+      ),
     );
   }
 }
@@ -274,7 +251,40 @@ class _PhotoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(photo.id);
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(borderRadiusMedium),
+      child: Stack(
+        children: [
+          Image.network(
+            photo.urls.small,
+            fit: BoxFit.cover,
+            //frameBuilder: (context, child, frame, wasSynchronouslyLoaded) => ,
+            loadingBuilder: (_, widget, loadingProgress) {
+              // if (loadingProgress == null) {
+              //   return widget;
+              // }
+
+              return _PhotoItemShimmer();
+            },
+            errorBuilder: (_, __, ___) => const Text("a"),
+            width: double.infinity,
+            height: 220,
+          ),
+          Text(photo.id),
+        ],
+      ),
+    );
+  }
+}
+
+class _PhotoItemShimmer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer(
+      builder: (context, child, decoration) => Container(
+        decoration: decoration,
+      ),
+    );
   }
 }
 
